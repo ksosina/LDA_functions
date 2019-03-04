@@ -1,4 +1,4 @@
-lorelogram <- function(data, id.col = 1, time.col = 4, y.col = 3){
+lorelogram <- function(data, id.col = 1, time.col = 4, y.col = 3, y_min = 0, y_max = 2){
   require(data.table)
   require(ggplot2)
   data <- data[, c(id.col, time.col, y.col), with = F]
@@ -57,8 +57,8 @@ lorelogram <- function(data, id.col = 1, time.col = 4, y.col = 3){
     geom_line(size = 2) +
     geom_point(size = 2, col = "grey") +
     xlab("Lag") + ylab("Log odds") +
-    scale_x_continuous(breaks = seq(1, 2, by = .5)) +
-    scale_y_continuous(breaks = seq(0, 2, by = 0.5)) +
+    scale_x_continuous(breaks = seq(1, max(LOR_estimates$time_diff), by = .5)) +
+    scale_y_continuous(breaks = seq(y_min, y_max, by = 0.5), limits = c(y_min, y_max)) +
     ggtitle("Lorelogram") +
     theme(plot.title = element_text(size = 22, face = "bold", hjust = 0.5),
           text = element_text(size = 18),
