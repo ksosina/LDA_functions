@@ -1,4 +1,4 @@
-lorelogram <- function(data, id.col = 1, time.col = 4, y.col = 3, y_min = 0, y_max = 2){
+lorelogram_v2 <- function(data, id.col = 1, time.col = 4, y.col = 3, y_min = 0, y_max = 2){
   require(data.table)
   require(ggplot2)
   data <- data[, c(id.col, time.col, y.col), with = F]
