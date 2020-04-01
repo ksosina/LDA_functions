@@ -64,7 +64,7 @@ lorelogram_v2 <- function(data, id.col = 1, time.col = 4, y.col = 3){
   p1 <- ggplot(LOR_estimates, aes(x = time_diff, y = point_est))+
     geom_line(size = 2) +
     geom_point(size = 3, col = "grey") +
-    xlab("Lag") + ylab("Log odds") +
+    xlab("Lag") + ylab("Log odds ratio") +
     scale_x_continuous(breaks = seq(1, max(LOR_estimates$time_diff), by = .5)) +
     # scale_y_continuous(breaks = my_breaks, limits = y_lims) +
     ggtitle("Lorelogram") +
