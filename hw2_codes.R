@@ -1,6 +1,7 @@
-lorelogram_v2 <- function(data, id.col = 1, time.col = 4, y.col = 3, y_min = 0, y_max = 2){
-  require(data.table)
-  require(ggplot2)
+lorelogram_v2 <- function(data, id.col = 1, time.col = 4, y.col = 3){
+  
+  packs <- c("dplyr", "data.table", "ggplot2")
+  suppressMessages(packs <- sapply(packs, require, character.only = T))
   data <- data[, c(id.col, time.col, y.col), with = F]
   names(data) <- c("id", "time", "y")
   data <- data.table(data)
@@ -20,10 +21,12 @@ lorelogram_v2 <- function(data, id.col = 1, time.col = 4, y.col = 3, y_min = 0, 
   out <- lapply(1:nrow(my_comb), function(i){
     
     # Get outcomes at each timepoint 
-    y_late <- data[time == my_comb[i, 2], 3]
-    y_early <- data[time == my_comb[i, 1], 3]
+    y_late <- data[time == my_comb[i, 2], .(id, y)]
+    y_early <- data[time == my_comb[i, 1], .(id, y)]
     time_diff <- my_comb[i, 2] - my_comb[i, 1]
-    out_data <- data.table(id = out_id, y_late, y_early, time_diff)
+    # out_data <- data.table(id = out_id, y_late, y_early, time_diff)
+    out_data <- inner_join(data.table(id = out_id), y_early, by = "id") %>% 
+      inner_join(data.table(y_late, time_diff),  by = "id") %>% data.table
     names(out_data) <- c("id", "y_late", "y_early", "time_diff")
     out_data
     
@@ -53,12 +56,17 @@ lorelogram_v2 <- function(data, id.col = 1, time.col = 4, y.col = 3, y_min = 0, 
     no_x_axis_label <- theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
   }
   
+  
+  # y_lims <- range(LOR_estimates$point_est)
+  # y_lims <- round(y_lims, digits = digits)
+  # my_breaks <- seq(y_lims[1], y_lims[2], by = .5)
+  
   p1 <- ggplot(LOR_estimates, aes(x = time_diff, y = point_est))+
     geom_line(size = 2) +
-    geom_point(size = 2, col = "grey") +
+    geom_point(size = 3, col = "grey") +
     xlab("Lag") + ylab("Log odds") +
     scale_x_continuous(breaks = seq(1, max(LOR_estimates$time_diff), by = .5)) +
-    scale_y_continuous(breaks = seq(y_min, y_max, by = 0.5), limits = c(y_min, y_max)) +
+    # scale_y_continuous(breaks = my_breaks, limits = y_lims) +
     ggtitle("Lorelogram") +
     theme(plot.title = element_text(size = 22, face = "bold", hjust = 0.5),
           text = element_text(size = 18),
